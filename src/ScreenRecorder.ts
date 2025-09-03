@@ -1,6 +1,8 @@
 export interface IScreenRecorder {
   start(onData?: (sizeInBytes: number) => void): Promise<void>;
   stop(): Promise<Blob | null>;
+  pause(): void;
+  resume(): void;
 }
 
 export class ScreenRecorder implements IScreenRecorder {
@@ -41,6 +43,26 @@ export class ScreenRecorder implements IScreenRecorder {
     } catch (error) {
       console.error('Error starting recording:', error);
       throw error;
+    }
+  }
+
+  pause(): void {
+    try {
+      if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+        this.mediaRecorder.pause();
+      }
+    } catch (error) {
+      console.error('Error pausing recording:', error);
+    }
+  }
+
+  resume(): void {
+    try {
+      if (this.mediaRecorder && this.mediaRecorder.state === 'paused') {
+        this.mediaRecorder.resume();
+      }
+    } catch (error) {
+      console.error('Error resuming recording:', error);
     }
   }
 

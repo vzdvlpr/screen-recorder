@@ -14,6 +14,14 @@ export class RecordingService {
     }
   }
 
+  pauseRecording(): void {
+    this.recorder.pause();
+  }
+
+  resumeRecording(): void {
+    this.recorder.resume();
+  }
+
   private download(blob: Blob) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

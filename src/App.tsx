@@ -19,6 +19,7 @@ function formatTime(seconds: number): string {
 
 const App = () => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [fileSize, setFileSize] = useState(0);
   const [timeLimit, setTimeLimit] = useState(0);
   const [remainingTime, setRemainingTime] = useState(0);
@@ -28,20 +29,33 @@ const App = () => {
     setRemainingTime(timeLimitSeconds);
     await recordingService.startRecording((size) => setFileSize(size));
     setIsRecording(true);
+    setIsPaused(false);
   };
 
   const handleStop = async () => {
     await recordingService.stopRecording();
     setIsRecording(false);
+    setIsPaused(false);
     setFileSize(0);
     setRemainingTime(0);
+  };
+
+  const handlePauseResume = () => {
+    if (!isRecording) return;
+    if (isPaused) {
+      recordingService.resumeRecording();
+      setIsPaused(false);
+    } else {
+      recordingService.pauseRecording();
+      setIsPaused(true);
+    }
   };
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(handleStop): suppress dependency handleStop
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
 
-    if (isRecording && remainingTime > 0) {
+    if (isRecording && !isPaused && remainingTime > 0) {
       interval = setInterval(() => {
         setRemainingTime((prev) => {
           if (prev <= 1) {
@@ -59,7 +73,7 @@ const App = () => {
         clearInterval(interval);
       }
     };
-  }, [isRecording, remainingTime]);
+  }, [isRecording, isPaused, remainingTime]);
 
   return (
     <div>
@@ -79,6 +93,15 @@ const App = () => {
       <div>
         <button type="button" onClick={handleStart} disabled={isRecording}>
           Start Recording
+        </button>
+
+        <button
+          type="button"
+          onClick={handlePauseResume}
+          disabled={!isRecording}
+          aria-pressed={isPaused}
+        >
+          {isPaused ? 'Resume' : 'Pause'}
         </button>
 
         <button type="button" onClick={handleStop} disabled={!isRecording}>
