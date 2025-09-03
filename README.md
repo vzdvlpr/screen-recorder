@@ -1,5 +1,5 @@
 
-# current tab video recorder exmple with timer and file size
+# current tab video recorder with timer and file size
 
 # Rsbuild project
 
